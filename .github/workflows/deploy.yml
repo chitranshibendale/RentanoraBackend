@@ -1,0 +1,44 @@
+name: Deploy backend to Lambda
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  check-identity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show AWS deployment identity
+        shell: python
+        run: |
+          import base64
+          import json
+          import os
+          import urllib.request
+
+          url = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
+          request = urllib.request.Request(
+              url + "&audience=sts.amazonaws.com",
+              headers={
+                  "Authorization": "bearer " + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]
+              },
+          )
+
+          with urllib.request.urlopen(request, timeout=30) as response:
+              token = json.load(response)["value"]
+
+          print("::add-mask::" + token)
+
+          payload = token.split(".")[1]
+          payload += "=" * (-len(payload) % 4)
+          claims = json.loads(base64.urlsafe_b64decode(payload))
+
+          print(json.dumps({
+              "sub": claims["sub"],
+              "aud": claims["aud"],
+          }, indent=2))
