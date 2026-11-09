@@ -1,79 +1,64 @@
 package com.rentanora.backend.auth;
 
-import java.util.List;
+import static com.rentanora.backend.constants.AuthConstants.*;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.security.Principal;
+
 import jakarta.validation.Valid;
 
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import java.security.Principal;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class AuthController {
 
     private final AuthService authService;
-    private final SecurityContextRepository securityContextRepository;
 
-    public AuthController(
-            AuthService authService,
-            SecurityContextRepository securityContextRepository) {
-
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.securityContextRepository = securityContextRepository;
     }
 
-    @GetMapping("/api/auth/me")
+    @PostMapping(LOGIN_PATH)
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody LoginRequest loginRequest) {
+
+        var result = authService.authenticate(loginRequest)
+                .authenticationResult();
+
+        if (result == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    ADDITIONAL_AUTH_REQUIRED
+            );
+        }
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .body(new LoginResponse(
+                        result.accessToken(),
+                        result.expiresIn()
+                ));
+    }
+
+    @GetMapping(CURRENT_USER_PATH)
     public UserResponse currentUser(Principal principal) {
         return new UserResponse(principal.getName());
     }
 
-    public record UserResponse(String userId) {}
+    public record UserResponse(String userId) {
+    }
 
-    @PostMapping("/api/auth/login")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void login(
-            @Valid @RequestBody LoginRequest loginRequest,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+    public record LoginResponse(String accessToken, Integer expiresIn) {
 
-        String userId = authService.authenticateUser(loginRequest);
-
-        request.getSession();
-        request.changeSessionId();
-
-        var authentication =
-                UsernamePasswordAuthenticationToken.authenticated(
-                        userId,
-                        null,
-                        List.of()
-                );
-
-        var context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
-
-        securityContextRepository.saveContext(
-                context,
-                request,
-                response
-        );
-
-        new HttpSessionCsrfTokenRepository().saveToken(
-                null,
-                request,
-                response
-        );
-
-        response.setHeader("Cache-Control", "no-store");
+        @Override
+        public String toString() {
+            return REDACTED_LOGIN_RESPONSE;
+        }
     }
 }
