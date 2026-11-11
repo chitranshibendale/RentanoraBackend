@@ -2,6 +2,26 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "ManageVerificationHashSecret",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:UpdateSecret",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:DeleteSecret",
+        "secretsmanager:TagResource",
+        "secretsmanager:UntagResource"
+      ],
+      "Resource": "arn:aws:secretsmanager:us-east-1:070389302498:secret:rentanora-contact-verification-otp-key-??????"
+    },
+    {
+      "Sid": "GenerateVerificationHashSecret",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetRandomPassword",
+      "Resource": "*"
+    },
+    {
       "Sid": "DeployVerificationStack",
       "Effect": "Allow",
       "Action": [

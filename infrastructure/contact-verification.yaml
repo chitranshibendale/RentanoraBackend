@@ -1,5 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Temporary contact verification storage for Rentanora
+Description: Rentanora signup verification storage and security key
+Metadata:
+  AWSToolsMetrics:
+    AWSAgentToolkit: aws-cloudformation@3
 
 Parameters:
   VerificationTableName:
@@ -8,6 +11,29 @@ Parameters:
     Description: DynamoDB table for temporary verification records
 
 Resources:
+  VerificationHashSecret:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: Protect verification codes with a server-only HMAC key.
+        must:
+          - Never expose the secret value through API responses or logs.
+          - Preserve the key while verification records depend on it.
+    Properties:
+      Name: !Sub '${AWS::StackName}-otp-key'
+      Description: Server-side key for protecting Rentanora verification codes
+      GenerateSecretString:
+        PasswordLength: 64
+        ExcludePunctuation: true
+        IncludeSpace: false
+      Tags:
+        - Key: Application
+          Value: Rentanora
+        - Key: Purpose
+          Value: ContactVerification
+
   ContactVerificationTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -35,6 +61,10 @@ Resources:
           Value: ContactVerification
 
 Outputs:
+  VerificationHashSecretArn:
+    Description: ARN of the verification code protection key
+    Value: !Ref VerificationHashSecret
+
   VerificationTableName:
     Description: Contact verification table name
     Value: !Ref ContactVerificationTable
