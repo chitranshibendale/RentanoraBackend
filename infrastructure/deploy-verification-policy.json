@@ -2,6 +2,23 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "ManageVerificationEmailIdentity",
+      "Effect": "Allow",
+      "Action": [
+        "ses:CreateEmailIdentity",
+        "ses:GetEmailIdentity",
+        "ses:DeleteEmailIdentity",
+        "ses:PutEmailIdentityDkimAttributes",
+        "ses:PutEmailIdentityDkimSigningAttributes",
+        "ses:PutEmailIdentityFeedbackAttributes",
+        "ses:PutEmailIdentityMailFromAttributes",
+        "ses:ListTagsForResource",
+        "ses:TagResource",
+        "ses:UntagResource"
+      ],
+      "Resource": "arn:aws:ses:us-east-1:070389302498:identity/rentanora.com"
+    },
+    {
       "Sid": "ManageVerificationHashSecret",
       "Effect": "Allow",
       "Action": [
@@ -32,6 +49,7 @@
         "cloudformation:DescribeStacks",
         "cloudformation:DescribeStackEvents",
         "cloudformation:GetTemplate",
+        "cloudformation:GetTemplateSummary",
         "cloudformation:TagResource",
         "cloudformation:UntagResource"
       ],

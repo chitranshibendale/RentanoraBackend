@@ -39,4 +39,34 @@ public final class VerificationConstants {
 
     public static final String BOTH_CONTACTS_REQUIRED =
             "Verify your phone number and email address before creating your account.";
+
+    public static final String HASH_ALGORITHM = "HmacSHA256";
+
+    public static final int MIN_HASH_SECRET_LENGTH = 64;
+
+    public static final String INVALID_HASH_SECRET =
+            "The verification security key is missing or invalid.";
+
+    public static final String HASH_OPERATION_FAILED =
+            "Unable to protect the verification code.";
+
+    public static final String VERIFICATION_SESSION_EXPIRED =
+            "Your verification session has expired. Please start again.";
+
+    public static final String EMAIL_FORMAT_PATTERN =
+            "^[^\\s@]+@[^\\s@.]+(?:\\.[^\\s@.]+)+$";
+
+    public static final String PHONE_FORMAT_PATTERN =
+            "^\\+[1-9][0-9]{1,14}$";
+
+    public static final int MAX_EMAIL_LENGTH = 254;
+
+    public static final String INVALID_EMAIL =
+            "Enter a valid email address.";
+
+    public static final String INVALID_PHONE =
+            "Enter your phone number with its country code.";
+
+    public static final String INVALID_CHANNEL =
+            "Select email or phone verification.";
 }

@@ -11,6 +11,17 @@ Parameters:
     Description: DynamoDB table for temporary verification records
 
 Resources:
+  VerificationEmailIdentity:
+    Type: AWS::SES::EmailIdentity
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Metadata:
+      com.aws.cloudformation.Context:
+        why: Verify Rentanora domain ownership for sending verification emails.
+        must:
+          - Verify the domain through its DNS records before sending emails.
+    Properties:
+      EmailIdentity: rentanora.com
   VerificationHashSecret:
     Type: AWS::SecretsManager::Secret
     DeletionPolicy: Retain
@@ -72,3 +83,21 @@ Outputs:
   VerificationTableArn:
     Description: Contact verification table ARN
     Value: !GetAtt ContactVerificationTable.Arn
+
+    EmailDkimRecordName1:
+      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName1
+
+    EmailDkimRecordValue1:
+      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue1
+
+    EmailDkimRecordName2:
+      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName2
+
+    EmailDkimRecordValue2:
+      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue2
+
+    EmailDkimRecordName3:
+      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName3
+
+    EmailDkimRecordValue3:
+      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue3

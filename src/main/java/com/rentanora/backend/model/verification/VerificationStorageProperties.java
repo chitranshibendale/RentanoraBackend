@@ -12,7 +12,10 @@ public record VerificationStorageProperties(
         String region,
 
         @NotBlank
-        String tableName
+        String tableName,
+
+        @NotBlank
+        String hashSecretId
 
 ) {
 }

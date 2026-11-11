@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
+import java.time.Clock;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({
@@ -22,5 +24,19 @@ public class VerificationConfig {
         return DynamoDbClient.builder()
                 .region(Region.of(properties.region()))
                 .build();
+    }
+
+    @Bean(destroyMethod = "close")
+    public SecretsManagerClient verificationSecretsManagerClient(
+            VerificationStorageProperties properties) {
+
+        return SecretsManagerClient.builder()
+                .region(Region.of(properties.region()))
+                .build();
+    }
+
+    @Bean
+    public Clock verificationClock() {
+        return Clock.systemUTC();
     }
 }
