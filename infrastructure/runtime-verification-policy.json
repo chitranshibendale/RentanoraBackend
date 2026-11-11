@@ -2,6 +2,17 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "SendVerificationEmails",
+      "Effect": "Allow",
+      "Action": "ses:SendEmail",
+      "Resource": "arn:aws:ses:us-east-1:070389302498:identity/rentanora.com",
+      "Condition": {
+        "StringEquals": {
+          "ses:FromAddress": "no-reply@rentanora.com"
+        }
+      }
+    },
+    {
       "Sid": "AccessVerificationRecords",
       "Effect": "Allow",
       "Action": [
