@@ -4,6 +4,10 @@ import static com.rentanora.backend.constants.AuthConstants.*;
 
 import java.security.Principal;
 
+import com.rentanora.backend.model.auth.LoginResponse;
+import com.rentanora.backend.model.auth.RegistrationResponse;
+import com.rentanora.backend.model.auth.SignUpRequest;
+import com.rentanora.backend.model.auth.UserResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.CacheControl;
@@ -46,19 +50,23 @@ public class AuthController {
                 ));
     }
 
+    @PostMapping(SIGN_UP_PATH)
+    public ResponseEntity<RegistrationResponse> signUp(
+            @Valid @RequestBody SignUpRequest signUpRequest) {
+
+        var result = authService.register(signUpRequest);
+        var delivery = result.codeDeliveryDetails();
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .cacheControl(CacheControl.noStore())
+                .body(new RegistrationResponse(
+                        Boolean.TRUE.equals(result.userConfirmed()),
+                        delivery == null ? null : delivery.destination()
+                ));
+    }
+
     @GetMapping(CURRENT_USER_PATH)
     public UserResponse currentUser(Principal principal) {
         return new UserResponse(principal.getName());
-    }
-
-    public record UserResponse(String userId) {
-    }
-
-    public record LoginResponse(String accessToken, Integer expiresIn) {
-
-        @Override
-        public String toString() {
-            return REDACTED_LOGIN_RESPONSE;
-        }
     }
 }

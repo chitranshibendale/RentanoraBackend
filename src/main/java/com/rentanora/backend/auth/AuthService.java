@@ -2,6 +2,7 @@ package com.rentanora.backend.auth;
 
 import java.util.Map;
 
+import com.rentanora.backend.model.auth.SignUpRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,13 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoun
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserRequest;
+import static com.rentanora.backend.constants.AuthConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpResponse;
 
 @Service
 public class AuthService {
@@ -83,5 +91,106 @@ public class AuthService {
         } catch (NotAuthorizedException | UserNotFoundException exception) {
             throw new InvalidCredentialsException();
         }
+    }
+
+    public SignUpResponse register(SignUpRequest signUpRequest) {
+        String email = signUpRequest.email().strip();
+        String phone = signUpRequest.phone().strip();
+
+        if (!phone.matches(PHONE_NUMBER_PATTERN)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    INVALID_PHONE_NUMBER
+            );
+        }
+
+        List<AttributeType> attributes = new ArrayList<>();
+
+        addAttribute(
+                attributes,
+                EMAIL_ATTRIBUTE,
+                email
+        );
+
+        addAttribute(
+                attributes,
+                FIRST_NAME_ATTRIBUTE,
+                signUpRequest.firstName()
+        );
+
+        addAttribute(
+                attributes,
+                MIDDLE_NAME_ATTRIBUTE,
+                signUpRequest.middleName()
+        );
+
+        addAttribute(
+                attributes,
+                LAST_NAME_ATTRIBUTE,
+                signUpRequest.lastName()
+        );
+
+        addAttribute(
+                attributes,
+                PHONE_ATTRIBUTE,
+                phone
+        );
+
+        addAttribute(
+                attributes,
+                CITY_ATTRIBUTE,
+                signUpRequest.city()
+        );
+
+        addAttribute(
+                attributes,
+                STATE_ATTRIBUTE,
+                signUpRequest.state()
+        );
+
+        addAttribute(
+                attributes,
+                COUNTRY_ATTRIBUTE,
+                signUpRequest.country()
+        );
+
+        addAttribute(
+                attributes,
+                PINCODE_ATTRIBUTE,
+                signUpRequest.pincode()
+        );
+
+        var request =
+                software.amazon.awssdk.services.cognitoidentityprovider
+                        .model.SignUpRequest.builder()
+                        .clientId(clientId)
+                        .username(email)
+                        .password(signUpRequest.password())
+                        .secretHash(CognitoSecretHash.calculate(
+                                email,
+                                clientId,
+                                clientSecret
+                        ))
+                        .userAttributes(attributes)
+                        .build();
+
+        return cognitoClient.signUp(request);
+    }
+
+    private static void addAttribute(
+            List<AttributeType> attributes,
+            String name,
+            String value) {
+
+        if (value == null || value.isBlank()) {
+            return;
+        }
+
+        attributes.add(
+                AttributeType.builder()
+                        .name(name)
+                        .value(value.strip())
+                        .build()
+        );
     }
 }

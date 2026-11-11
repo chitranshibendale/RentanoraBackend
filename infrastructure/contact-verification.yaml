@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Temporary contact verification storage for Rentanora
+
+Parameters:
+  VerificationTableName:
+    Type: String
+    Default: rentanora-contact-verification
+    Description: DynamoDB table for temporary verification records
+
+Resources:
+  ContactVerificationTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Ref VerificationTableName
+      BillingMode: PAY_PER_REQUEST
+
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+
+      Tags:
+        - Key: Application
+          Value: Rentanora
+        - Key: Purpose
+          Value: ContactVerification
+
+Outputs:
+  VerificationTableName:
+    Description: Contact verification table name
+    Value: !Ref ContactVerificationTable
+
+  VerificationTableArn:
+    Description: Contact verification table ARN
+    Value: !GetAtt ContactVerificationTable.Arn

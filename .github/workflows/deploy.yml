@@ -47,6 +47,11 @@ jobs:
           compression-level: 0
           retention-days: 1
 
+      - name: Checkout infrastructure
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
   deploy:
     name: Deploy to Lambda
     needs: build
@@ -74,6 +79,24 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
           allowed-account-ids: '070389302498'
+
+      - name: Validate verification infrastructure
+        shell: bash
+        run: |
+          aws cloudformation validate-template \
+            --template-body file://infrastructure/contact-verification.yaml \
+            --region us-east-1 \
+            --no-cli-pager
+
+      - name: Deploy verification infrastructure
+        shell: bash
+        run: |
+          aws cloudformation deploy \
+            --template-file infrastructure/contact-verification.yaml \
+            --stack-name rentanora-contact-verification \
+            --region us-east-1 \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
 
       - name: Deploy backend code
         shell: bash

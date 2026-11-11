@@ -2,6 +2,9 @@ package com.rentanora.backend.config;
 
 import static com.rentanora.backend.constants.AuthConstants.HEALTH_PATH;
 import static com.rentanora.backend.constants.AuthConstants.LOGIN_PATH;
+import static com.rentanora.backend.constants.AuthConstants.SIGN_UP_PATH;
+import static com.rentanora.backend.constants.AuthConstants.CONFIRM_SIGN_UP_PATH;
+import static com.rentanora.backend.constants.AuthConstants.RESEND_CONFIRMATION_PATH;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +35,10 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,
-                                LOGIN_PATH
+                                LOGIN_PATH,
+                                SIGN_UP_PATH,
+                                CONFIRM_SIGN_UP_PATH,
+                                RESEND_CONFIRMATION_PATH
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
