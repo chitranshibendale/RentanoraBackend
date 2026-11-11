@@ -84,20 +84,20 @@ Outputs:
     Description: Contact verification table ARN
     Value: !GetAtt ContactVerificationTable.Arn
 
-    EmailDkimRecordName1:
-      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName1
+  EmailDkimRecordName1:
+    Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName1
 
-    EmailDkimRecordValue1:
-      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue1
+  EmailDkimRecordValue1:
+    Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue1
 
-    EmailDkimRecordName2:
-      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName2
+  EmailDkimRecordName2:
+    Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName2
 
-    EmailDkimRecordValue2:
-      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue2
+  EmailDkimRecordValue2:
+    Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue2
 
-    EmailDkimRecordName3:
-      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName3
+  EmailDkimRecordName3:
+    Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenName3
 
-    EmailDkimRecordValue3:
-      Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue3
+  EmailDkimRecordValue3:
+    Value: !GetAtt VerificationEmailIdentity.DkimDNSTokenValue3
