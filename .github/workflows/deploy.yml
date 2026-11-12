@@ -31,6 +31,20 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Checkout CommonLib
+        uses: actions/checkout@v7
+        with:
+          repository: chitranshibendale/RentanoraCommonLib
+          ref: main
+          path: common-lib
+          token: ${{ secrets.COMMON_LIB_READ_TOKEN }}
+          persist-credentials: false
+
+      - name: Install CommonLib
+        run: |
+          bash ./mvnw --batch-mode --no-transfer-progress \
+            -f common-lib/pom.xml clean install
+
       - name: Build and test
         env:
           COGNITO_USER_POOL_ID: us-east-1_test

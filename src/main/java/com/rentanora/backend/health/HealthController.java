@@ -1,5 +1,6 @@
 package com.rentanora.backend.health;
 
+import com.rentanora.common.model.health.HealthResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +13,4 @@ public class HealthController {
     public HealthResponse health() {
         return new HealthResponse("UP");
     }
-
-    public record HealthResponse(String status) {}
 }
